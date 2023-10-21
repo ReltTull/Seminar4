@@ -5,17 +5,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
-import java.net.URLConnection;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FIleLoader {
     private String url;
+    /**
+     * путь в директорию, куда надо сохранить
+     */
     private String pathToSave;
+    /**
+     * имя файла, включая формат
+     */
     private String name;
-
+    /**
+     * коллекция стримов для управления отдельными
+     */
     private List<InputStream> streams = new ArrayList<>();
 
     public FIleLoader(String url, String path, String name) {
@@ -43,12 +49,16 @@ public class FIleLoader {
     }
 
 
-    // toDo: перегрузка метода, создать коллекцию inputStream (ArrayList?), чтобы можно было управлять стримами
+    /**
+     * метод скачивания одного файла
+     * @throws MalformedURLException
+     */
     public void downloadFile() throws MalformedURLException {
         try {
             URL link = new URL(getUrl());
             InputStream inputStream = link.openStream();
             Files.copy(inputStream, new File(getPathToSave()).toPath());
+            System.out.println("File has been saved in " + getPathToSave());
         } catch (MalformedURLException exception) {
             exception.getMessage();
         } catch (IOException e) {
@@ -56,6 +66,11 @@ public class FIleLoader {
         }
     }
 
+    /**
+     * метод скачивания файла в несколько потоков InputStream, которые сохраняются в List<InputStream> streams.
+     * @param streamCount
+     * @throws MalformedURLException
+     */
     public void downloadFile(int streamCount) throws MalformedURLException {
         try {
             URL link = new URL(getUrl());
@@ -64,6 +79,7 @@ public class FIleLoader {
                 InputStream inputStream = link.openStream();
                 streams.add(inputStream);
                 Files.copy(inputStream, new File(getPathToSave() + getName()).toPath());
+                System.out.println("File has been saved in " + getPathToSave());
             }
         } catch (MalformedURLException exception) {
             exception.getMessage();
@@ -72,6 +88,11 @@ public class FIleLoader {
         }
     }
 
+    /**
+     * метод остановки InputStream по индексу в List<InputStream> streams.
+     * @param index
+     * @throws IOException
+     */
     public void stopStream(int index) throws IOException {
         try {
             streams.get(index).close();
